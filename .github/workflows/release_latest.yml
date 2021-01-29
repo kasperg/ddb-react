@@ -1,0 +1,37 @@
+on:
+  push:
+    branches:
+      - 'master'
+
+name: Update latest release
+
+jobs:
+  release:
+    name: Upload latest release asset
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Required to fetch all commits and tags
+          fetch-depth: 0
+      - uses: bahmutov/npm-install@v1
+      - name: Install Dependencies
+        run: yarn install
+      - name: Build artifacts
+        run: |
+          VERSION_FILE_NAME=$GITHUB_REPOSITORY \
+          VERSION_FILE_VERSION=$(git describe --tags --exclude=latest) \
+          yarn build
+      - name: Zip project
+        run: |
+          zip -r -j dist.zip dist/
+      - name: Update latest release
+        uses: ncipollo/release-action@v1
+        with:
+          commit: ${{ env.GITHUB_SHA }}
+          name: latest
+          prerelease: true
+          allowUpdates: true
+          artifacts: dist.zip
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}

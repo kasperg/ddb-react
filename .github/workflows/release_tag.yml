@@ -1,0 +1,54 @@
+on:
+  push:
+    tags:
+      - '*'
+
+name: Create release
+
+jobs:
+  github_release:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Required to fetch all commits and tags
+          fetch-depth: 0
+      - uses: bahmutov/npm-install@v1
+      - name: Install Dependencies
+        run: yarn install
+      - name: Set version
+        run: yarn version --new-version $(git describe --tags --exclude=latest) --no-git-tag-version
+      - name: Build artifacts
+        run: |
+          VERSION_FILE_NAME=$GITHUB_REPOSITORY \
+          VERSION_FILE_VERSION=$(git describe --tags --exclude=latest) \
+          yarn build
+      - name: Zip project
+        run: |
+          zip -r -j dist.zip dist/
+      - name: Create GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: dist.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  github_npm_package:
+    name: Publish GitHub NPM package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Required to fetch all commits and tags
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+        with:
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Install Dependencies
+        run: yarn install
+      - name: Set version
+        run: yarn version --new-version $(git describe --tags --exclude=latest) --no-git-tag-version
+      - name: Publish NPM package
+        run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
