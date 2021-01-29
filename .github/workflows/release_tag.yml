@@ -14,9 +14,8 @@ jobs:
         with:
           # Required to fetch all commits and tags
           fetch-depth: 0
-      - uses: bahmutov/npm-install@v1
       - name: Install Dependencies
-        run: yarn install
+        uses: bahmutov/npm-install@v1
       - name: Set version
         run: yarn version --new-version $(git describe --tags --exclude=latest) --no-git-tag-version
       - name: Build artifacts

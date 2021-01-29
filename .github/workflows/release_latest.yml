@@ -14,9 +14,8 @@ jobs:
         with:
           # Required to fetch all commits and tags
           fetch-depth: 0
-      - uses: bahmutov/npm-install@v1
       - name: Install Dependencies
-        run: yarn install
+        uses: bahmutov/npm-install@v1
       - name: Build artifacts
         run: |
           VERSION_FILE_NAME=$GITHUB_REPOSITORY \
@@ -29,7 +28,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           commit: ${{ env.GITHUB_SHA }}
-          name: latest
+          tag: latest
           prerelease: true
           allowUpdates: true
           artifacts: dist.zip
