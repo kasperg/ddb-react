@@ -48,6 +48,8 @@ jobs:
         run: yarn install
       - name: Set version
         run: yarn version --new-version $(git describe --tags --exclude=latest) --no-git-tag-version
+      - name: Build project
+        run: yarn build
       - name: Publish NPM package
         run: yarn publish
         env:
