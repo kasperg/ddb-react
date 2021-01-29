@@ -2,6 +2,7 @@
   "name": "ddb-react",
   "version": "0.0.1-rc.2",
   "license": "AGPL-3.0-only",
+  "repository": "git://github.com/kasperg/ddb-react.git",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
